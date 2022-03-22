@@ -1,0 +1,13 @@
+/etc/ansible/hosts (Archivo de configuración en Ubuntu )
+    - Para que haya conexión de manera local se puede añadir abajo del todo un línea
+      localhost <ansible_connetion=local>
+    - Para añadir una conexión a un servidor por ejemplo SSH solo hay que añadir la dirección del servidor
+    - Para conectarse con un usuario predeterminado podemos usar el parámetro ansible_user=<usuario> después de la dirección del servidor 
+ansible <servidor(es)|grupo(s)> -m ping (Prueba de conexión con los servidores)
+ansible <servidor(es)|grupo(s)> -a "comando" (Ejecuta un comando en el servidor)
+  - Ejemplo conexión servidor con usuario vagrant (ansible 192.168.1.30 -u vagrant -m ping) 
+  - Ejemplo conexión a todos los servidores con usuario vagrant (ansible all -u vagrant -m ping) 
+Si necesitamos hacer uso de los permisos de root podemos añadir un --become
+  - Ejemplo uso become
+      - ansible 192.168.1.10 -a "adduser Cisco" --> ERROR
+      - ansible 192.168.1.10 -a "adduser Cisco" --become --> Succesfully
