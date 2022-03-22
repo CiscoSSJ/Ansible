@@ -1,3 +1,6 @@
+# **COMANDOS Y CONFIGURACIÓN BÁSICA**
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
 /etc/ansible/hosts (Archivo de configuración en Ubuntu )
     - Para que haya conexión de manera local se puede añadir abajo del todo un línea
       localhost <ansible_connetion=local>
@@ -11,3 +14,75 @@ Si necesitamos hacer uso de los permisos de root podemos añadir un --become
   - Ejemplo uso become
       - ansible 192.168.1.10 -a "adduser Cisco" --> ERROR
       - ansible 192.168.1.10 -a "adduser Cisco" --become --> Succesfully
+
+# **CREACIÓN Y CONFIGURACIÓN DE GRUPOS**
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+En el archivo /etc/ansible/hosts creamos el grupo entre corchetes
+  - Ejemplo de creación de grupos
+    #Archivo /hosts
+    [ubuntu]
+    192.168.1.10
+    [debian]
+    192.168.1.20
+
+    $ ansible debian -m ping --> sería lo mismo que si yo usase el comando ansible 192.168.1.20 -m ping
+    $ ansible ubuntu -m ping --> sería lo mismo que si yo usase el comando ansible 192.168.1.10 -m ping
+
+Un servidor puedes estar en 1 o más grupos
+
+Un grupo puede tener sub-grupos, estos se definen 
+  - [S.O:children]
+    ubuntu 
+    debian
+
+Un grupo puede tener variables 
+  - [S.O:vars]
+    ansible_become=TRUE
+Ahora todas las veces que ejecutemos ansible con el grupo S.O se ejecutará la variable sudo
+  $ ansible S.O -a whoami
+
+
+Se puede separar las variables en ficheros
+  - /etc/ansible/group_vars/<grupo>
+  - /etc/ansible/group_vars/<servidor> 
+
+# **EJEMEPLOS DE PARÁMETROS**
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+ansible_connection | ssh    -->   | ansible_host
+                   | local        | ansible_port
+                                  | ansible_user
+                                  | ansible_ssh_private_key_file
+
+ansible_become | true    -->   | ansible_become_method -->  | su
+               | false         |ansible_become_user         | sudo
+
+
+Es pobile utilizar un inventario dinámico a partir de:
+  - Proveedor cloud
+    - AWS
+    - GCP
+    - Digitasl Ocean
+  - Entornos propios:
+    - Openstack
+    - Ovist
+    - Openshit
+    - Zabbix
+URL Scripts: https://github.com/ansible/ansible --> contrib/inventory
+
+# **OPCIONES MODO ADHOC**
+ansible [opciones] servidores|grupos|all [-m módulo] [-a argumentos]
+          |  |
+          |  |__| --limit srv1,srv2,srv3,...
+          |     | --user
+          |     | --become
+          |     | -f (nº de conexiones simultaneas)
+          |__| all --list-hosts (Lista todos los gosts)
+             | -C (Comprueba si la tarea se realizará de manera satisfactoria)
+             | -v (Más información, cuantas más v más información)
+
+ansible [opciones] servidores|grupos|all [-m módulo] [-a argumentos]
+                                              |
+                                              |__| setup
+                                                 | copy --> "src=/etc/hosts dest=/etc/ansible/hosts"
+                                                 | yum/apt --> "name=vim state=present|latests|absent"
