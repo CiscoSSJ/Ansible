@@ -487,11 +487,33 @@ Imagen 6
       autoremove=yes/no
       defualt_release=release
     - Ejemplo:
-      - name: Instalar nginx
-        apt:
-          name: nginx
-          state: latest
       - name: Actualizar lista de paquetes
         apt: update_cache=yes
       - name: Actualiza todos los paquetes
         apt: upgrade=dist
+      - name: Instalar nginx
+        apt:
+          name: nginx
+          state: latest
+
+
+  - Módulo apt_key
+      data=clave
+      file=fichero
+      id=identificador
+      keyring=/ruta/trusted.gpg/
+      keyserver=servidor
+      state|present
+            |absent
+      url=dirección
+      validate_certs=yes/no
+    - Ejemplos:
+      - name: Añadir clave usando servidor
+        apt-key:
+          keyserver: keyserver.ubuntu.com
+          id: 35A7D838SA..
+          
+      - name: Añadir utilizando un fichero adjunto
+        apt-key:
+          url:"https://ftp.master.debian.org/keys/archive-key-6.0.asc"
+          state: present
