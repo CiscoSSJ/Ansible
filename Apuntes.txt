@@ -487,4 +487,11 @@ Imagen 6
       autoremove=yes/no
       defualt_release=release
     - Ejemplo:
-      - name:
+      - name: Instalar nginx
+        apt:
+          name: nginx
+          state: latest
+      - name: Actualizar lista de paquetes
+        apt: update_cache=yes
+      - name: Actualiza todos los paquetes
+        apt: upgrade=dist
