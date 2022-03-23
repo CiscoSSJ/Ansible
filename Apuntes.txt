@@ -86,3 +86,16 @@ ansible [opciones] servidores|grupos|all [-m módulo] [-a argumentos]
                                               |__| setup
                                                  | copy --> "src=/etc/hosts dest=/etc/ansible/hosts"
                                                  | yum/apt --> "name=vim state=present|latests|absent"
+
+# **ADMINISTRAR SERVIDORES WINDOWS**
+
+Para administrar servidores Windows necesitaremos la librería pywinrm, este se instala:
+  - Descargando el instalador pip --> $ sudo apt install pip -y
+  - Descargando la librería mediante este nuevo instalador --> $ sudo pip install pywinrm
+  - Habilitar puerto 5486
+  - Powershell 3.0 o superior
+  - Habilitar control remoto (ConfigureRemotingForAnsible.ps1)
+Para conectarnos al servidor Windows y probar conexión --> $ ansible -c winrm -k (Pide contraseña)-u <usuario> -m win_ping 
+Tendremos que validar o ignorar el certificado
+  - Para validarlo tendremos que copiar el certificado autosigned en nuestro servidor
+  - Podemos ignorarlo añadiendo ansible_winrm_server_cert_validation=ignore
