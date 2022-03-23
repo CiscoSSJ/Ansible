@@ -205,7 +205,7 @@ Se dividen en 20 categorias:
 - database        - monitoring    - source control        - windows
 Todos estos los podemos ver con el comando $ ansible-doc -l
 
-# **MÓDULOS DE FICHEROS Y OPENSSL
+# **MÓDULOS DE FICHEROS Y OPENSSL**
 
 Imagen 1
 Imagen 2
@@ -321,7 +321,7 @@ Imagen 2
   - Módulo lineinfile
     - Obligatorios:
       line="Texto"
-      dest=/directorio/fichero
+      path=/directorio/fichero
     - Opcionales:
       backup=yes/no
       owner=usuario
@@ -334,19 +334,19 @@ Imagen 2
     - Ejemplo:
       Deshabilita SELinux
         - lineinfile: 
-            dest: /etc/selinux/config
+            path: /etc/selinux/config
             regexp: "^SELINUX="
             line: "SELINUX=disabled"
       
       Borrar línea en fichero
         - lineinfile:
-            dest: /etc/sudoers
+            path: /etc/sudoers
             state: absent
             regexp: "^%wheel"
 
       Añadir antes de una línea
         - lineinfile:
-            dest: /etc/apache2/parts.conf
+            path: /etc/apache2/parts.conf
             regexp: "^Listen"
             insertafter: "Listen 80"
             line: "Listen 8080"
@@ -354,7 +354,7 @@ Imagen 2
   - Módulo blockinfile
     - Obligatorios:
       block= "texto"
-      dest=/directorio/fichero
+      path=/directorio/fichero
     - Opcionales:
       backup=yes/no
       owner=usuario
@@ -368,9 +368,123 @@ Imagen 2
       Asegurar que bloque de texto está en fichero
         - name: Configurar sshd_config
           blockinfile:
-            dest: /etc/ssh/sshd_config
+            path: /etc/ssh/sshd_config
             block: |
               Match user monitor
                 Password Authentication no
   
   - Módulo openssl_privatekey
+    - Obligatorios:
+      path=/direcotorio/fichero
+    - Opcionales:
+      force= True/false
+      size= 4096
+      state= present/absent
+      type= RSA/DSA
+    - Ejemplos
+      Instala módulo de Phyton requerido
+        - name: Instalar python-pyopenssl
+          apt: name= python-openssl state=latest
+        - name: Generar clave privada
+          openssl_privatekey: path= /etc/ssl/private/cisco.pem 
+
+  - Módulo openssl_publickey
+    - Obligatorios:
+      path=/direcotorio/fichero
+      privatekey_path=/ruta/fichero.pem
+    - Opcionales:
+      force= True/false
+      state= present/absent
+    - Ejemplos
+      Instala módulo de Phyton requerido
+        - name: Instalar python-pyopenssl
+          apt: name= python-openssl state=latest
+        - name: Generar clave prublica
+          path: /etc/ssl/public/cisco.pem
+          openssl_privatekey: 
+            path: /etc/ssl/private/cisco.pem    
+
+
+# **MÓDULOS GESTOR DE PAQUETES**
+
+Imagen 4
+Imagen 5
+Imagen 6
+
+  - Módulo cpanm:
+      from_path= ruta
+      name= nombre
+      locallib= ruta
+      mirror= mirror
+      mirror_only= yes/no
+      notest= yes/no
+      verson= versión
+      system_lib= directorio
+    - Se requiere el módulo perl_App_cpanminus y gcc
+    - Ejemplo:
+      - name: Instalar gcc
+        yum: name=gcc
+      - name: Instalar primero cpanm
+        yum: name=perl_App_cpanminus
+      - name: Instalar módulo DBI
+        cpanm: name=DBI
+      - name: Instalar vesión específica
+        cpanm:
+            name: DBI
+            version: "1.360"
+    
+  - Módulo easy-install
+    - Obligatorio:
+      name=nombre
+    - Opcionales:
+      state=present/latest
+      virtualenv=yes/no
+      virtualenv_command:comando
+      virtualenv_site_packages=yes/no
+      executable=ruta ejecución
+    - Ejemplos:
+      - name: Instalador p.p
+        easy_install:
+          name: pip 
+          state: latest
+    
+  - Módulo pip
+      name=nombre
+      state=|present
+            |latest
+            |absent
+            |forcereinstall
+      virtualenv=yes/no
+      virtualenv_command:comando
+      virtualenv_packages:yes/no
+      executable=ruta ejecución
+      requirements=fichero.texto
+      version=versión
+      chdir=ruta
+    - Ejemplo:
+      - name: Instalar requests
+        pip:
+          name: requests
+          state: latest
+      - name Instalar requsiitos
+        pip: requirements=/m.app/requirements.txt
+
+  - Módulo apt
+      name=nombre[=versión]
+      state|latest
+           |absent
+           |present
+           |build-dep
+
+      upgrade|no
+             |yes
+             |safe/full/dist
+
+      force=yes/no
+      update_cache=yes/no
+      purge=yes/no
+      deb=/ruta/fichero.deb
+      autoremove=yes/no
+      defualt_release=release
+    - Ejemplo:
+      - name:
