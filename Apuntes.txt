@@ -204,3 +204,173 @@ Se dividen en 20 categorias:
 - crypto          - messaging     - remote management     - web infrastructures
 - database        - monitoring    - source control        - windows
 Todos estos los podemos ver con el comando $ ansible-doc -l
+
+# **MÓDULOS DE FICHEROS Y OPENSSL
+
+Imagen 1
+Imagen 2
+
+- Módulo copy
+  - Obligatorio:
+    dest= /directorio/fichero
+  - Opcionales:
+    backup=yes/no
+    content="contenido"
+    force=yes/no
+    owner=usuario
+    group=grupo
+    mode=modo
+    src=/directorio/fichero
+  - Ejemplos:
+    Imagen 3
+
+- Módulo template
+  - Obligatorio:
+    dest= /directorio/fichero
+    src= /directorio/fichero
+  - Opcionales:
+    backup=yes/no
+    force=yes/no
+    owner=usuario
+    group=grupo
+    mode=modo
+  - Ejemplo:
+    Copiar fichero y establecer propietario
+    - name: Copiar configuración
+      template: 
+        src: apachw2.conf.j2
+        dest: /etc/apache2/apache2.conf
+        owner: www-data
+        group: www-data
+
+- Módulo file
+  - Obligatorio:
+    path= /directorio/fichero
+  - Opcionales:
+    backup=yes/no
+    force=yes/no
+    owner=usuario
+    group=grupo
+    mode=modo
+    state=|file
+          |link
+          |directory
+          |hard
+          |touch
+          |absent
+  - Ejemplo
+    Cambiar permisos
+    - name: Cambiar permisos
+      file: 
+        dest: /etc/apache2/apache2.conf
+        mode= "u=rw,g=rw,o=r"
+        owner: www-data
+        group: www-data
+
+- Módulo stat
+  - Obligatorio:
+    path= /direcotrio/fichero
+  - Opcionales:
+    get_attributes= true/false
+    get_checksum= true/false
+    get_md5= true/false
+    get_mime= true/false
+  - Ejemplo
+    Obtener información y guardarla
+    - stat: path=/etc/services
+      register: datos
+    - debug: var=datos
+    - debug: msg= "Es un directorio"
+      when: datos.stat.isdir
+
+- Módulo fetch 
+  - Obligatorios:
+    dest= /directorio/fichero
+    src= /directorio/fichero
+  - Opcionales:
+    fail_on_missing=yes/no
+    flat=yes/no
+  - Ejemplos:
+    Copia fichero desde un nodo remoto
+      - name: Guardar fichero configuración red
+        fetch: src=/etc/network/interfaces dest= /tmp/backup
+
+    Copia el fichero en plano desde un nodo remoto
+      - name: Guardar fichero de configuración red en plano
+        fetch: src=/etc/network/interfaces dest= /tmp/backup/interfaces flat=yes
+
+  - Módulo unarchive
+    - Obligatorios:
+      dest= /directorio/fichero
+      src= /directorio/fichero
+    - Opcionales:
+      owner= usuario
+      group= grupo
+      mode= modo
+      remote_src= yes/no
+      list_files= yes/no
+    - Ejemplos:
+      Copia y extrae un fichero en el nodo remoto
+        - name: copia y extrae aplicación
+          unarchive: src=oracle.tgz dest=/opt/oracle
+
+      Extrae un fichero ya existente en el nodo
+        - name: Extrae un fichero
+          unardchive: src=/tmp/oracle.tgz dest/opt/oracle remote_src=true
+
+  - Módulo lineinfile
+    - Obligatorios:
+      line="Texto"
+      dest=/directorio/fichero
+    - Opcionales:
+      backup=yes/no
+      owner=usuario
+      group=grupo
+      mode=modo
+      insertafter=expresión
+      insertbefore=expresión
+      regexp=expresión
+      state= present/absent
+    - Ejemplo:
+      Deshabilita SELinux
+        - lineinfile: 
+            dest: /etc/selinux/config
+            regexp: "^SELINUX="
+            line: "SELINUX=disabled"
+      
+      Borrar línea en fichero
+        - lineinfile:
+            dest: /etc/sudoers
+            state: absent
+            regexp: "^%wheel"
+
+      Añadir antes de una línea
+        - lineinfile:
+            dest: /etc/apache2/parts.conf
+            regexp: "^Listen"
+            insertafter: "Listen 80"
+            line: "Listen 8080"
+  
+  - Módulo blockinfile
+    - Obligatorios:
+      block= "texto"
+      dest=/directorio/fichero
+    - Opcionales:
+      backup=yes/no
+      owner=usuario
+      group=grupo
+      mode=modo
+      insertafter=expresión
+      insertbefore=expresión
+      marker=marcador
+      state= present/absent
+    - Ejemplo:
+      Asegurar que bloque de texto está en fichero
+        - name: Configurar sshd_config
+          blockinfile:
+            dest: /etc/ssh/sshd_config
+            block: |
+              Match user monitor
+                Password Authentication no
+  
+  - Módulo openssl_privatekey
