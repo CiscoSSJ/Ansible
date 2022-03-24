@@ -479,7 +479,6 @@ Imagen 6
       upgrade|no
              |yes
              |safe/full/dist
-
       force=yes/no
       update_cache=yes/no
       purge=yes/no
@@ -495,7 +494,6 @@ Imagen 6
         apt:
           name: nginx
           state: latest
-
 
   - Módulo apt_key
       data=clave
@@ -517,3 +515,63 @@ Imagen 6
         apt-key:
           url:"https://ftp.master.debian.org/keys/archive-key-6.0.asc"
           state: present
+
+  - Módulo apt_repository
+    - Obligatorio
+      repo=origen
+    - Opcional:
+      state|present
+           |absent
+      filename=nombre
+      update_cache=yes/no
+      validate_certs=yes/no
+      mode=modo(420)
+    - Ejemplo:
+      - name: Añadir repositorio google-chrome
+        apt-repository:
+          repo: deb http://....
+          state: present
+          filename: "google-chrome"
+      - name: Añadir repositorio ubuntu
+        apt_repository: repo="ppa:nginx/stable"
+
+    - Módulo package
+      - Obligatorio
+        name=origen
+        state|present
+             |absent
+             |latest
+      - Opcionales:
+        use=auto/yum/apt
+      - Ejemplo:
+        name: Instalar ntpdate
+        package:
+          name: ntpdate
+          state: latest
+
+    - Módulo redhat_subscription
+        state|present
+            |absent
+        activationkey=clave
+        autosubscribe=yes/no
+        org_id=organización
+        pod=nombre
+        username=usuario
+        password=clave
+        server_hostaname=servidor
+        force_register=yes/no
+      - Ejemplos:
+        - name: Registrar sistema 
+         redhat_subscription:
+          state: present
+          username: cisco@gmail.com
+          password: 1234
+          autosubscribe: yes
+        - name: Registrar sistema
+          redhat_subscription:
+            state: present
+            activationkey: mi-clave
+            org_id: 2456
+            pod: "^Red Hat Enterprise Server $"
+
+    
